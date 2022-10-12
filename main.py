@@ -1,4 +1,6 @@
 import math
+from random import randint
+
 import pygame
 
 pygame.init()
@@ -96,7 +98,7 @@ def draw(win, paddle, ball, bricks, lives):
     for brick in bricks:
         brick.draw(win)
 
-    lives_text = LIVES_FONT.render(f"Lives: {lives}", 1, "black")
+    lives_text = LIVES_FONT.render(f"Lives: {lives}", True, "black")
     win.blit(lives_text, (10, HEIGHT - lives_text.get_height() - 10))
 
     pygame.display.update()
@@ -137,16 +139,25 @@ def generate_bricks(rows, cols):
 
     for row in range(rows):
         for col in range(cols):
+
             brick = Brick(col * brick_width + gap * col,
                           row * brick_height + gap * row,
                           brick_width,
                           brick_height,
                           2,
-                          [(0, 255, 0), (255, 0, 0)]
+                          [random_color(), random_color()]
                           )
             bricks.append(brick)
 
     return bricks
+
+
+def random_color():
+    r = randint(0, 255)
+    g = randint(0, 255)
+    b = randint(0, 255)
+    rand_color = (r, g, b)
+    return rand_color
 
 
 def main():
@@ -168,7 +179,7 @@ def main():
         ball.y = paddle_y - BALL_RADIUS
 
     def display_text(text):
-        text_render = LIVES_FONT.render(text, 1, "red")
+        text_render = LIVES_FONT.render(text, True, "red")
         win.blit(text_render, (WIDTH / 2 - text_render.get_width() / 2, HEIGHT / 2 - text_render.get_height() / 2))
         pygame.display.update()
         pygame.time.delay(3000)
