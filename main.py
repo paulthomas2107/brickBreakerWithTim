@@ -1,11 +1,14 @@
 import math
 import pygame
 
+pygame.init()
+
 WIDTH, HEIGHT = 800, 600
 FPS = 60
 PADDLE_WIDTH = 100
 PADDLE_HEIGHT = 15
 BALL_RADIUS = 10
+LIVES_FONT = pygame.font.SysFont("comicsans", 40)
 
 win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Brick Breaker with Tim")
@@ -36,7 +39,7 @@ class Ball:
         self.y = y
         self.radius = radius
         self.color = color
-        self.x_vel = 2
+        self.x_vel = 0
         self.y_vel = -self.VEL
 
     def move(self):
@@ -48,6 +51,7 @@ class Ball:
         self.y_vel = y_vel
 
     def draw(self, win):
+
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius)
 
 
@@ -84,13 +88,16 @@ class Brick:
         return tuple(int(a + (b - a) * t) for a, b in zip(color_a, color_b))
 
 
-def draw(win, paddle, ball, bricks):
+def draw(win, paddle, ball, bricks, lives):
     win.fill("white")
     paddle.draw(win)
     ball.draw(win)
 
     for brick in bricks:
         brick.draw(win)
+
+    lives_text = LIVES_FONT.render(f"Lives: {lives}", 1, "black")
+    win.blit(lives_text, (10, HEIGHT - lives_text.get_height() - 10))
 
     pygame.display.update()
 
@@ -152,6 +159,7 @@ def main():
     ball = Ball(WIDTH / 2, paddle_y - BALL_RADIUS, BALL_RADIUS, "black")
 
     bricks = generate_bricks(3, 10)
+    lives = 3
 
     run = True
     while run:
@@ -179,7 +187,23 @@ def main():
             if brick.health <= 0:
                 bricks.remove(brick)
 
-        draw(win, paddle, ball, bricks)
+        if ball.y + ball.radius >= HEIGHT:
+            lives -= 1
+            ball.x = paddle.x + paddle.width / 2
+            ball.y = paddle_y - BALL_RADIUS
+            ball.set_vel(0, ball.VEL * -1)
+
+        if lives <= 0:
+            paddle = Paddle(paddle_x, paddle_y, PADDLE_WIDTH, PADDLE_HEIGHT, "black")
+            ball = Ball(WIDTH / 2, paddle_y - BALL_RADIUS, BALL_RADIUS, "black")
+            bricks = generate_bricks(3, 10)
+            lives = 3
+            lost_text= LIVES_FONT.render("You lost !", 1, "red")
+            win.blit(lost_text, (WIDTH / 2 - lost_text.get_width() / 2, HEIGHT / 2 - lost_text.get_height() / 2))
+            pygame.display.update()
+            pygame.time.delay(3000)
+
+        draw(win, paddle, ball, bricks, lives)
 
     quit()
 
