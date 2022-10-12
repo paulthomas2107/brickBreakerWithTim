@@ -1,13 +1,14 @@
+import math
 import pygame
 
 WIDTH, HEIGHT = 800, 600
-win = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Brick Breaker with Tim")
-
 FPS = 60
 PADDLE_WIDTH = 100
 PADDLE_HEIGHT = 15
 BALL_RADIUS = 10
+
+win = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Brick Breaker with Tim")
 
 
 class Paddle:
@@ -35,7 +36,7 @@ class Ball:
         self.y = y
         self.radius = radius
         self.color = color
-        self.x_vel = 0
+        self.x_vel = 2
         self.y_vel = -self.VEL
 
     def move(self):
@@ -61,8 +62,27 @@ def ball_collision(ball):
     if ball.x - BALL_RADIUS <= 0 or ball.x + BALL_RADIUS >= WIDTH:
         ball.set_vel(ball.x_vel * -1, ball.y_vel)
 
-    if ball.y + BALL_RADIUS >= HEIGHT or  ball.y - BALL_RADIUS <= 0:
+    if ball.y + BALL_RADIUS >= HEIGHT or ball.y - BALL_RADIUS <= 0:
         ball.set_vel(ball.x_vel, ball.y_vel * -1)
+
+
+def ball_paddle_collision(ball, paddle):
+    if not(ball.x <= paddle.x + paddle.width and ball.x >= paddle.x):
+        return
+    if not(ball.y + ball.radius >= paddle.y):
+        return
+
+    paddle_center = paddle.x + paddle.width / 2
+    distance_to_center = ball.x - paddle_center
+
+    percent_width = distance_to_center / paddle.width
+    angle = percent_width * 90
+    angle_radians = math.radians(angle)
+
+    x_vel = math.sin(angle_radians) * ball.VEL
+    y_vel = math.cos(angle_radians) * ball.VEL * -1
+
+    ball.set_vel(x_vel, y_vel)
 
 
 def main():
@@ -93,6 +113,7 @@ def main():
 
         ball.move()
         ball_collision(ball)
+        ball_paddle_collision(ball, paddle)
         draw(win, paddle, ball)
 
     pygame.quit()
