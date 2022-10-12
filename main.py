@@ -57,14 +57,22 @@ def draw(win, paddle, ball):
     pygame.display.update()
 
 
+def ball_collision(ball):
+    if ball.x - BALL_RADIUS <= 0 or ball.x + BALL_RADIUS >= WIDTH:
+        ball.set_vel(ball.x_vel * -1, ball.y_vel)
+
+    if ball.y + BALL_RADIUS >= HEIGHT or  ball.y - BALL_RADIUS <= 0:
+        ball.set_vel(ball.x_vel, ball.y_vel * -1)
+
+
 def main():
     clock = pygame.time.Clock()
 
-    center_x = WIDTH / 2 - PADDLE_WIDTH / 2
+    paddle_x = WIDTH / 2 - PADDLE_WIDTH / 2
     paddle_y = HEIGHT - PADDLE_HEIGHT - 5
 
-    paddle = Paddle(center_x, paddle_y, PADDLE_WIDTH, PADDLE_HEIGHT, "black")
-    ball = Ball(center_x, paddle_y - BALL_RADIUS, BALL_RADIUS, "black")
+    paddle = Paddle(paddle_x, paddle_y, PADDLE_WIDTH, PADDLE_HEIGHT, "black")
+    ball = Ball(WIDTH / 2, paddle_y - BALL_RADIUS, BALL_RADIUS, "black")
 
     run = True
     while run:
@@ -84,7 +92,7 @@ def main():
             paddle.move(1)
 
         ball.move()
-
+        ball_collision(ball)
         draw(win, paddle, ball)
 
     pygame.quit()
