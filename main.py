@@ -5,8 +5,8 @@ win = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Brick Breaker with Tim")
 
 FPS = 60
-PADDLE_WIDTH = 40
-PADDLE_HEIGHT = 10
+PADDLE_WIDTH = 100
+PADDLE_HEIGHT = 15
 
 
 class Paddle:
@@ -21,6 +21,9 @@ class Paddle:
 
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.height))
+
+    def move(self, direction=1):
+        self.x = self.x + self.VEL * direction
 
 
 def draw(win, paddle):
@@ -37,11 +40,20 @@ def main():
     run = True
     while run:
         clock.tick(FPS)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
-        
+
+        keys = pygame.key.get_pressed()
+
+        if keys[pygame.K_LEFT] and paddle.x - paddle.VEL >= 0:
+            paddle.move(-1)
+
+        if keys[pygame.K_RIGHT] and paddle.x + paddle.width + paddle.VEL <= WIDTH:
+            paddle.move(1)
+
         draw(win, paddle)
         
     pygame.quit()
