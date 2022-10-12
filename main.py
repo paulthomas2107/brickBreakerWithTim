@@ -161,6 +161,18 @@ def main():
     bricks = generate_bricks(3, 10)
     lives = 3
 
+    def reset():
+        paddle.x = paddle_x
+        paddle.y = paddle_y
+        ball.x = WIDTH / 2
+        ball.y = paddle_y - BALL_RADIUS
+
+    def display_text(text):
+        text_render = LIVES_FONT.render(text, 1, "red")
+        win.blit(text_render, (WIDTH / 2 - text_render.get_width() / 2, HEIGHT / 2 - text_render.get_height() / 2))
+        pygame.display.update()
+        pygame.time.delay(3000)
+
     run = True
     while run:
         clock.tick(FPS)
@@ -193,15 +205,19 @@ def main():
             ball.y = paddle_y - BALL_RADIUS
             ball.set_vel(0, ball.VEL * -1)
 
+        # Lose
         if lives <= 0:
-            paddle = Paddle(paddle_x, paddle_y, PADDLE_WIDTH, PADDLE_HEIGHT, "black")
-            ball = Ball(WIDTH / 2, paddle_y - BALL_RADIUS, BALL_RADIUS, "black")
             bricks = generate_bricks(3, 10)
             lives = 3
-            lost_text= LIVES_FONT.render("You lost !", 1, "red")
-            win.blit(lost_text, (WIDTH / 2 - lost_text.get_width() / 2, HEIGHT / 2 - lost_text.get_height() / 2))
-            pygame.display.update()
-            pygame.time.delay(3000)
+            reset()
+            display_text("You Lose !!")
+
+        # Win
+        if len(bricks) == 0:
+            bricks = generate_bricks(3, 10)
+            lives = 3
+            reset()
+            display_text("You Win !!")
 
         draw(win, paddle, ball, bricks, lives)
 
